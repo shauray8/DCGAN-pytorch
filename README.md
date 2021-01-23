@@ -1,2 +1,3 @@
-# DCGAN-pytorch
-DCGAN implementation on different  datasets 
+# DEEP CONVOLUTIONAL GENERATIVE ADVERSARIAL NETWORKS
+
+## Updating readme on the go !
