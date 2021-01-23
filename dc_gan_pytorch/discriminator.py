@@ -19,7 +19,7 @@ class Discriminator_block(nn.Module):
             self.batchnorm(features, features*2, 4, 2, 1),
             # 16*16
             
-            self.batchnorm(featuresi*2, features*4, 4, 2, 1),
+            self.batchnorm(features*2, features*4, 4, 2, 1),
             # 8*8
             
             self.batchnorm(features*4, features*8, 4, 2, 1),
