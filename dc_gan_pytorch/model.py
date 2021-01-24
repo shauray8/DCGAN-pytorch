@@ -8,6 +8,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from tqdm import trange
 import matplotlib.pyplot as plt
+import torchvision.utils as vutils
+
 
 from discriminator import Discriminator_block
 from generator import Generator_block
@@ -45,7 +47,7 @@ transform = transforms.Compose([
                              std=[0.229, 0.224, 0.225])
 ])
 
-batch_size=128
+batch_size=32
 
 dataset = datasets.ImageFolder(root='../simpsons/',transform=transform)
 dataset_loader = torch.utils.data.DataLoader(dataset,
@@ -66,43 +68,43 @@ D = Discriminator_block(CHANNELS, FEATURES).to(device)
 initialize_weight(G)
 initialize_weight(D)
 
-optim_G = optim.Adam(G.parameters, lr = LEARNING_RATE, betas=(.5, 0.999))
-optim_D = optim.Adam(D.parameters, lr = LEARNING_RATE, betas=(.5, 0.999))
+optim_G = optim.Adam(G.parameters(), lr = LEARNING_RATE, betas=(.5, 0.999))
+optim_D = optim.Adam(D.parameters(), lr = LEARNING_RATE, betas=(.5, 0.999))
 loss_function = nn.BCELoss()
 
 G.train()
 D.train()
 
-D_labels = torch.ones([batch_size,1]).to('cuda')
-D_fakes = torch.zeros([batch_size,1]).to('cuda')
+D_labels = torch.ones([batch_size,1]).to(device)
+D_fakes = torch.zeros([batch_size,1]).to(device)
 D_losses = []
 G_losses = []
 img_list = []
 
 for epoch in (wal := trange(max_epoch)):
-    for id,(images,_) in enumerate(dataset_loader):
+    for step,(images,_) in enumerate(dataset_loader):
         x = images.to(device)
-        x_output = D(x)
-        D_x_loss = loss_function(x_output, D_labels)
+        x_output = D(x).reshape(-1)
+        D_x_loss = loss_function(x_output, torch.ones_like(x_output).to(device))
 
-        z = torch.randn(batch_size, NOISE).to(device)
-        z_output = D(G(z))
-        D_z_loss = loss_function(z_output, D_fakes)
+        z = torch.randn(batch_size, NOISE,1,1).to(device)
+        z_output = D(G(z)).reshape(-1)
+        D_z_loss = loss_function(z_output, torch.zeros_like(z_output).to(device))
         D_loss = D_x_loss + D_z_loss
 
         optim_D.zero_grad()
         D_loss.backward()
         optim_D.step()
 
-        z = torch.randn(batch_size, NOISE).to(device)
-        z_output = D(G(z))
-        G_loss = loss_function(z_output, D_labels)
+        z = torch.randn(batch_size, NOISE,1,1).to(device)
+        z_output = D(G(z)).reshape(-1)
+        G_loss = loss_function(z_output, torch.ones_like(z_output).to(device))
 
         optim_G.zero_grad()
         G_loss.backward()
         optim_G.step()
 
-        wal.set_description(f'Step: {id}, D Loss: {D_loss.item()}, G Loss: {G_loss.item()}')
+        wal.set_description(f'Step: {step}, D Loss: {D_loss.item()}, G Loss: {G_loss.item()}')
         D_losses.append(D_loss.item())
         G_losses.append(G_loss.item())
 
@@ -110,7 +112,7 @@ for epoch in (wal := trange(max_epoch)):
             with torch.no_grad():
                 fake = G(z).detach().cpu()
             img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-
+        step += 1
 with open('images.pkl','wb') as f:
     pickle.dump(img_list, f)
 
