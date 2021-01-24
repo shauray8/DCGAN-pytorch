@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 # generator for the GAN
-
+ 
 class Generator_block(nn.Module):
     def __init__(self, noise,channels,features):
         super(Generator_block, self).__init__()
