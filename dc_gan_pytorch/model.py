@@ -53,7 +53,7 @@ dataset_loader = torch.utils.data.DataLoader(dataset,
 
 
 max_epoch = 30
-device = torch.device('cuda' if torch.cuda.is_availavle() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 LEARNING_RATE = 2e-3
 NOISE = 100
 CHANNELS = 3
