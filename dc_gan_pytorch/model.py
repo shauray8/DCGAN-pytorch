@@ -66,8 +66,8 @@ D = Discriminator_block(CHANNELS, FEATURES).to(device)
 initialize_weight(G)
 initialize_weight(D)
 
-optim_G = optim.ADAM(G.parameters, lr = LEARNING_RATE, betas=(.5, 0.999))
-optim_D = optim.ADAM(D.parameters, lr = LEARNING_RATE, betas=(.5, 0.999))
+optim_G = optim.Adam(G.parameters, lr = LEARNING_RATE, betas=(.5, 0.999))
+optim_D = optim.Adam(D.parameters, lr = LEARNING_RATE, betas=(.5, 0.999))
 loss_function = nn.BCELoss()
 
 G.train()
