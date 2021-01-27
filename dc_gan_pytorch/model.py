@@ -111,7 +111,7 @@ for epoch in (wal := trange(max_epoch)):
         if step % 200 == 0:
             with torch.no_grad():
                 fake = G(z).detach().cpu()
-            img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
+            img_list.append(vutil s.make_grid(fake, padding=2, normalize=True))
         step += 1
 with open('images.pkl','wb') as f:
     pickle.dump(img_list, f)
